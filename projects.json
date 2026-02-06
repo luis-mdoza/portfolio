@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "react-native-migration",
+    "title": "React Native Migration",
+    "tldr": {
+      "heading": "React Native Migration (20-second TLDR)",
+      "bullets": [
+        "Role & Duration: Lead Product Designer for a multi-month migration project, collaborating with engineering and product to deliver a feature-parity React Native app.",
+        "Problem: The existing Flutter app limited hiring velocity and development efficiency; React Native offers a larger developer pool and faster ramp-up.",
+        "Solution: Migrate Kasheesh’s mobile app to React Native while preserving all current features, introduce a new card-selection toggle to replace the star UI, update branding, and align mobile designs with the shared React design system.",
+        "Outcome: Scalable foundation for future revenue features, reduced technical debt, improved engineering velocity, and a better cross-platform experience."
+      ]
+    },
+    "sections": [
+      {
+        "id": "tldr",
+        "label": "TLDR",
+        "includeInNav": true,
+        "body": "Role & Duration: Lead Product Designer for a multi-month migration project, collaborating with engineering and product to deliver a feature-parity React Native app. Problem: The existing Flutter app limited hiring velocity and development efficiency; React Native offers a larger developer pool and faster ramp-up. Solution: Migrate Kasheesh’s mobile app to React Native while preserving all current features, introduce a new card-selection toggle to replace the star UI, update branding, and align mobile designs with the shared React design system. Outcome: Scalable foundation for future revenue features, reduced technical debt, improved engineering velocity, and a better cross-platform experience."
+      },
+      {
+        "id": "overview",
+        "label": "Project Overview",
+        "includeInNav": true,
+        "body": "Product: Kasheesh mobile app migration to React Native (Phase 1). Role: Lead Product Designer — responsible for aligning design goals with engineering constraints, updating UI patterns, and ensuring parity with the current Flutter app. Team: Product manager, two mobile engineers, a QA lead, and a brand designer. Timeline: Development from early January to early February, followed by UAT and rework until mid-February, timed with App Store approvals. Methods: Cross-functional workshops, design audits, component mapping, Figma prototypes, QA collaboration, and user acceptance testing."
+      },
+      {
+        "id": "problem",
+        "label": "Problem/Context",
+        "includeInNav": true,
+        "body": "Kasheesh’s mobile app was built in Flutter, which limited hiring velocity and platform interoperability. React Native offers a mature ecosystem with a larger developer base and faster onboarding. React developers can get productive quickly, and an existing web team can share components and logic across platforms. Aligning with React Native reduces long-term technical debt and facilitates integration with React-based web systems."
+      },
+      {
+        "id": "solution",
+        "label": "Design/Solution",
+        "includeInNav": true,
+        "body": "Discovery: mapped every Flutter screen and identified platform-specific behaviors. Stakeholder interviews confirmed the star-based card selection UI was confusing; a toggle would be clearer and align with web patterns. Ideation & Prototyping: catalogued Flutter components and mapped them to React Native equivalents, designed a card toggle control, updated colors/typography/spacing, ensured feature parity across critical flows, and prototyped in Figma. Implementation & Testing: partnered with engineers to reuse APIs and match Flutter performance, delivered via Figma and Storybook, and validated through QA and UAT."
+      },
+      {
+        "id": "impact",
+        "label": "Impact/Learnings",
+        "includeInNav": true,
+        "body": "Feature Parity: 100% of legacy features work as expected. Stability: critical flows exhibit <1% error rate post-launch. Engineering Velocity: future features ship more quickly due to easier hiring and component reuse. Lessons learned: framework choice matters, parity plus subtle enhancements reduced risk, and early component mapping + close QA collaboration minimized regressions."
+      }
+    ]
+  }
+]

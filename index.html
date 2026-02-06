@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Luis Mendoza — Product Designer</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@900&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="is-intro">
+    <div class="intro" aria-hidden="true">
+      <div class="intro__line" data-scramble data-site="intro-line-1">
+        Selected Works
+      </div>
+      <div class="intro__line" data-scramble data-site="intro-line-2">
+        Product Design
+      </div>
+    </div>
+
+    <div class="custom-cursor" aria-hidden="true"></div>
+    <div class="scroll-progress" aria-hidden="true">
+      <span class="scroll-progress__bar"></span>
+    </div>
+    <button type="button" class="back-to-top" aria-label="Back to top">
+      Top
+    </button>
+
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand__name" data-scramble data-site="name">Luis Mendoza</span>
+        <span class="brand__role" data-scramble data-i18n="role" data-site="role">
+          Product Designer
+        </span>
+      </div>
+      <button type="button" class="menu-toggle" aria-label="Toggle menu">
+        <span></span>
+      </button>
+      <div class="site-actions">
+        <button type="button" class="drawer-close" aria-label="Close menu">
+          <span class="project-accordion__icon drawer-close__icon" aria-hidden="true"></span>
+        </button>
+        <nav class="site-nav">
+          <a href="#work" data-scramble data-i18n="nav_work">Work</a>
+          <a href="./resume.html" data-scramble data-i18n="nav_resume">Resume</a>
+        </nav>
+        <div class="lang-switch" role="tablist" aria-label="Language switch">
+          <button type="button" class="lang-switch__btn is-active" data-lang="en">
+            EN
+          </button>
+          <button type="button" class="lang-switch__btn" data-lang="ja">JA</button>
+          <button type="button" class="lang-switch__btn" data-lang="es">ES</button>
+        </div>
+      </div>
+    </header>
+    <div class="drawer-backdrop" aria-hidden="true"></div>
+
+    <main>
+      <section class="hero" id="work">
+        <div class="hero__title">
+          <h1 data-scramble data-i18n="hero_title">Works</h1>
+          <p data-scramble data-i18n="hero_subtitle">
+            Interaction-focused products, systems, and prototypes.
+          </p>
+        </div>
+        <div class="hero__controls">
+          <div class="filters" role="tablist" aria-label="Project filters">
+            <button type="button" class="filter pill is-active" data-filter="all">
+              <span data-i18n="filter_all">All</span>
+            </button>
+            <button type="button" class="filter pill" data-filter="app">
+              <span data-i18n="filter_app">#Application</span>
+            </button>
+            <button type="button" class="filter pill" data-filter="website">
+              <span data-i18n="filter_website">#Website</span>
+            </button>
+            <button type="button" class="filter pill" data-filter="service">
+              <span data-i18n="filter_service">#Service</span>
+            </button>
+            <button type="button" class="filter pill" data-filter="prototype">
+              <span data-i18n="filter_prototype">#Prototype</span>
+            </button>
+          </div>
+          <button type="button" class="filter-toggle pill" aria-label="Toggle filters">
+            <i class="fa-solid fa-filter" aria-hidden="true"></i>
+            <span class="sr-only">Filters</span>
+          </button>
+          <div class="view-toggle" role="tablist" aria-label="View toggle">
+            <button
+              type="button"
+              class="view-toggle__btn pill is-active"
+              data-view="grid"
+              aria-label="Grid view"
+              data-i18n-attr="aria-label"
+              data-i18n="view_grid"
+            >
+              <i class="fa-solid fa-grip" aria-hidden="true"></i>
+              <span class="sr-only" data-i18n="view_grid">Grid</span>
+            </button>
+            <button
+              type="button"
+              class="view-toggle__btn pill"
+              data-view="list"
+              aria-label="List view"
+              data-i18n-attr="aria-label"
+              data-i18n="view_list"
+            >
+              <i class="fa-solid fa-list" aria-hidden="true"></i>
+              <span class="sr-only" data-i18n="view_list">List</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="works" aria-live="polite">
+        <div class="works__grid" id="works-grid"></div>
+      </section>
+
+      <section class="about" id="about">
+        <h2 data-scramble data-i18n="about_title">About</h2>
+        <p data-scramble data-i18n="about_body">
+          I design product experiences across mobile, web, and embedded platforms. I focus
+          on systems thinking, motion, and tight collaboration with engineering teams.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="contact">
+      <div>
+        <span data-scramble data-i18n="footer_line">Let’s work together.</span>
+        <span class="footer-status" data-scramble data-site="status">
+          Available for 2026
+        </span>
+      </div>
+      <div class="site-footer__right">
+        <span data-scramble data-site="copyright">© 2026 Luis Mendoza</span>
+        <a href="mailto:hello@luismendoza.design" data-scramble data-site="email">
+          hello@luismendoza.design
+        </a>
+      </div>
+    </footer>
+
+    <script src="./site-data.js"></script>
+    <script src="./projects.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>

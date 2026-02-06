@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Project — Luis Mendoza</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@900&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="project-page">
+    <div class="custom-cursor" aria-hidden="true"></div>
+    <div class="scroll-progress" aria-hidden="true">
+      <span class="scroll-progress__bar"></span>
+    </div>
+    <button type="button" class="back-to-top" aria-label="Back to top">
+      Top
+    </button>
+
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand__name" data-scramble data-site="name">Luis Mendoza</span>
+        <span class="brand__role" data-scramble data-i18n="role" data-site="role">
+          Product Designer
+        </span>
+      </div>
+      <button type="button" class="menu-toggle" aria-label="Toggle menu">
+        <span></span>
+      </button>
+      <div class="site-actions">
+        <button type="button" class="drawer-close" aria-label="Close menu">
+          <span class="project-accordion__icon drawer-close__icon" aria-hidden="true"></span>
+        </button>
+        <nav class="site-nav">
+          <a href="./index.html#work" data-scramble data-i18n="nav_work">Work</a>
+          <a href="./resume.html" data-scramble data-i18n="nav_resume">Resume</a>
+        </nav>
+        <div class="lang-switch" role="tablist" aria-label="Language switch">
+          <button type="button" class="lang-switch__btn is-active" data-lang="en">
+            EN
+          </button>
+          <button type="button" class="lang-switch__btn" data-lang="ja">JA</button>
+          <button type="button" class="lang-switch__btn" data-lang="es">ES</button>
+        </div>
+      </div>
+    </header>
+    <div class="drawer-backdrop" aria-hidden="true"></div>
+
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="./index.html" data-i18n="breadcrumb_home">Home</a></li>
+        <li><a href="./index.html#work" data-i18n="breadcrumb_work">Work</a></li>
+        <li data-i18n="breadcrumb_current">Project</li>
+      </ol>
+    </nav>
+
+    <main class="project-content">
+      <article class="project-article project-article--two-col" id="project-template"></article>
+    </main>
+    <section class="project-showcase" id="project-showcase" aria-label="Work showcase"></section>
+
+    <footer class="site-footer" id="contact">
+      <div>
+        <span data-scramble data-i18n="footer_line">Let’s work together.</span>
+        <span class="footer-status" data-scramble data-site="status">
+          Available for 2026
+        </span>
+      </div>
+      <div class="site-footer__right">
+        <span data-scramble data-site="copyright">© 2026 Luis Mendoza</span>
+        <a href="mailto:hello@luismendoza.design" data-scramble data-site="email">
+          hello@luismendoza.design
+        </a>
+      </div>
+    </footer>
+
+    <script src="./site-data.js"></script>
+    <script src="./projects.js"></script>
+    <script src="./detail.js"></script>
+  </body>
+</html>
