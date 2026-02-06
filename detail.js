@@ -523,6 +523,12 @@ const renderProject = () => {
   const showcaseItems = getShowcaseItems(projectData);
   const sections = getProjectSections(projectData);
   const readTime = getReadTime(sections, projectData);
+  const toolsList = Array.isArray(projectData.tools) && projectData.tools.length
+    ? projectData.tools
+    : ["Figma", "FigJam", "Notion"];
+  const heroCaption = `${projectData.type || "Project"} · ${
+    projectData.year || ""
+  } · ${toolsList.slice(0, 3).join(", ")}`;
 
   projectTemplate.innerHTML = `
     <div class="project-hero" data-carousel>
@@ -541,6 +547,9 @@ const renderProject = () => {
       >
         <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
       </button>
+    </div>
+    <div class="project-hero__caption" data-auto-translate="true">
+      ${heroCaption}
     </div>
     <nav class="project-nav" aria-label="Section navigation">
       <div class="project-readtime" data-readtime>${readTime}</div>
