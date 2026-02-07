@@ -226,6 +226,9 @@ const supportsWebGL = () => {
   }
 };
 
+const WEBGL_DEBUG = true;
+let activeWebGLHover = null;
+
 const randomizeText = (text) =>
   text
     .split("")
@@ -329,6 +332,7 @@ let footerStatusTimer = null;
 
 const prefetchLink = (href) => {
   if (!href || prefetchedLinks.has(href)) return;
+  if (window.location.protocol === "file:") return;
   const link = document.createElement("link");
   link.rel = "prefetch";
   link.as = "document";
@@ -623,19 +627,8 @@ const setupHoverImages = (card, project) => {
   if (!mediaWrap || !img) return;
   const original = img.src;
 
-  images.forEach(preloadImage);
-  const loadedImages = getLoadedImages(images);
-
-  if (supportsWebGL() && loadedImages.length > 1) {
-    const controller = createWebGLHover(mediaWrap, loadedImages, original);
-    if (controller) {
-      card.addEventListener("mouseenter", controller.start);
-      card.addEventListener("mouseleave", controller.stop);
-      return;
-    }
-  }
-
   let timer = null;
+  let controller = null;
   const shuffle = (list) =>
     list
       .map((item) => ({ item, sort: Math.random() }))
@@ -643,6 +636,20 @@ const setupHoverImages = (card, project) => {
       .map(({ item }) => item);
 
   const start = () => {
+    images.forEach(preloadImage);
+    const loadedImages = getLoadedImages(images);
+    if (supportsWebGL() && loadedImages.length > 1) {
+      if (activeWebGLHover && activeWebGLHover !== controller) {
+        activeWebGLHover.stop(true);
+      }
+      controller = controller || createWebGLHover(mediaWrap, loadedImages, original);
+      if (controller) {
+        activeWebGLHover = controller;
+        controller.start();
+        return;
+      }
+    }
+    if (supportsWebGL()) return;
     const sequence = shuffle(getLoadedImages(images));
     if (sequence.length < 2) return;
     let index = 0;
@@ -657,6 +664,10 @@ const setupHoverImages = (card, project) => {
     clearInterval(timer);
     timer = null;
     img.src = original;
+    controller?.stop(true);
+    if (activeWebGLHover === controller) {
+      activeWebGLHover = null;
+    }
   };
 
   card.addEventListener("mouseenter", start);
@@ -667,6 +678,9 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
   const canvas = document.createElement("canvas");
   const gl = canvas.getContext("webgl", { premultipliedAlpha: false });
   if (!gl) return null;
+  if (WEBGL_DEBUG) {
+    console.log("[webgl] init", { sources });
+  }
 
   const vertexSrc = `
     attribute vec2 a_position;
@@ -712,6 +726,12 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    if (WEBGL_DEBUG) {
+      console.warn("[webgl] link failed", gl.getProgramInfoLog(program));
+    }
+    return null;
+  }
   gl.useProgram(program);
 
   const buffer = gl.createBuffer();
@@ -753,9 +773,11 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
   const loadImage = (src) =>
     new Promise((resolve, reject) => {
       const img = new Image();
+      img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);
       img.onerror = reject;
-      img.src = src;
+      const resolved = new URL(src, window.location.href).href;
+      img.src = resolved;
     });
 
   const imageCache = new Map();
@@ -803,6 +825,9 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
       gl.bindTexture(gl.TEXTURE_2D, tex1);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img1);
     } catch {
+      if (WEBGL_DEBUG) {
+        console.warn("[webgl] image load failed", { currentSrc, nextSrc });
+      }
       animating = false;
       stop();
       return;
@@ -830,6 +855,12 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     setSize();
     resizeObserver = new ResizeObserver(setSize);
     resizeObserver.observe(mediaWrap);
+    if (WEBGL_DEBUG) {
+      canvas.style.outline = "1px solid rgba(0, 0, 0, 0.25)";
+    }
+    if (WEBGL_DEBUG) {
+      console.log("[webgl] start");
+    }
     await transitionTo(0);
     timer = window.setInterval(() => {
       const nextIndex = (currentIndex + 1) % sources.length;
@@ -837,7 +868,7 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     }, 800);
   };
 
-  const stop = () => {
+  const stop = (lose = false) => {
     clearInterval(timer);
     timer = null;
     mediaWrap.classList.remove("is-webgl");
@@ -845,6 +876,9 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     if (resizeObserver) resizeObserver.disconnect();
     currentIndex = 0;
     animating = false;
+    if (lose) {
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
+    }
   };
 
   return { start, stop };
