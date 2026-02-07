@@ -239,13 +239,12 @@ main,
   justify-content: space-between;
   flex-direction: row;
   gap: 20px;
-  padding: 12px 16px;
-  width: 30vw;
+  padding: 12px 24px;
+  width: 45vw;
   min-width: 320px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.32);
   backdrop-filter: var(--globalnav-backdrop-filter);
   -webkit-backdrop-filter: var(--globalnav-backdrop-filter);
-  border: 1px solid var(--border);
   border-radius: 100px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
   z-index: 10;
