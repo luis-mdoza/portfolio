@@ -7,9 +7,10 @@ window.PROJECTS = [
     tags: ["app", "service"],
     thumbnail: "assets/projects/2602-admin-user-flags/thumbnail.jpg",
     images: [
-      "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='960' height='540'%3E%3Crect width='960' height='540' fill='%23d9d9d9'/%3E%3Ctext x='48' y='80' font-family='Helvetica Neue, Arial, sans-serif' font-size='28' fill='%23111111'%3EMigration 01%3C/text%3E%3C/svg%3E",
-      "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='960' height='540'%3E%3Crect width='960' height='540' fill='%23e2e2e2'/%3E%3Ctext x='48' y='80' font-family='Helvetica Neue, Arial, sans-serif' font-size='28' fill='%23111111'%3EMigration 02%3C/text%3E%3C/svg%3E",
-      "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='960' height='540'%3E%3Crect width='960' height='540' fill='%23ededed'/%3E%3Ctext x='48' y='80' font-family='Helvetica Neue, Arial, sans-serif' font-size='28' fill='%23111111'%3EMigration 03%3C/text%3E%3C/svg%3E",
+      "assets/projects/2602-admin-user-flags/images-00.jpg",
+      "assets/projects/2602-admin-user-flags/images-01.jpg",
+      "assets/projects/2602-admin-user-flags/images-02.jpg",
+      "assets/projects/2602-admin-user-flags/images-03.jpg",
     ],
     tldr: {
       heading: "React Native Migration (20-second TLDR)",
