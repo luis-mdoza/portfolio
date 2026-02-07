@@ -205,6 +205,27 @@ const charset = "01";
 const loopHandles = new WeakMap();
 const hoverTimeouts = new WeakMap();
 
+const imageLoadCache = new Map();
+const preloadImage = (src) => {
+  if (!src || imageLoadCache.has(src)) return;
+  const img = new Image();
+  img.onload = () => imageLoadCache.set(src, true);
+  img.onerror = () => imageLoadCache.set(src, false);
+  img.src = src;
+};
+
+const getLoadedImages = (sources) =>
+  sources.filter((src) => imageLoadCache.get(src) !== false);
+
+const supportsWebGL = () => {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
+  } catch {
+    return false;
+  }
+};
+
 const randomizeText = (text) =>
   text
     .split("")
@@ -597,11 +618,24 @@ const setupCardScramble = (card) => {
 const setupHoverImages = (card, project) => {
   const images = project.images || [];
   if (!images.length) return;
-  const img = card.querySelector(".work-card__media img");
-  if (!img) return;
+  const mediaWrap = card.querySelector(".work-card__media");
+  const img = mediaWrap?.querySelector("img");
+  if (!mediaWrap || !img) return;
   const original = img.src;
-  let timer = null;
 
+  images.forEach(preloadImage);
+  const loadedImages = getLoadedImages(images);
+
+  if (supportsWebGL() && loadedImages.length > 1) {
+    const controller = createWebGLHover(mediaWrap, loadedImages, original);
+    if (controller) {
+      card.addEventListener("mouseenter", controller.start);
+      card.addEventListener("mouseleave", controller.stop);
+      return;
+    }
+  }
+
+  let timer = null;
   const shuffle = (list) =>
     list
       .map((item) => ({ item, sort: Math.random() }))
@@ -609,7 +643,8 @@ const setupHoverImages = (card, project) => {
       .map(({ item }) => item);
 
   const start = () => {
-    const sequence = shuffle(images);
+    const sequence = shuffle(getLoadedImages(images));
+    if (!sequence.length) return;
     let index = 0;
     clearInterval(timer);
     timer = window.setInterval(() => {
@@ -626,6 +661,193 @@ const setupHoverImages = (card, project) => {
 
   card.addEventListener("mouseenter", start);
   card.addEventListener("mouseleave", stop);
+};
+
+const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl", { premultipliedAlpha: false });
+  if (!gl) return null;
+
+  const vertexSrc = `
+    attribute vec2 a_position;
+    attribute vec2 a_uv;
+    varying vec2 v_uv;
+    void main() {
+      v_uv = a_uv;
+      gl_Position = vec4(a_position, 0.0, 1.0);
+    }
+  `;
+
+  const fragmentSrc = `
+    precision mediump float;
+    varying vec2 v_uv;
+    uniform sampler2D u_tex0;
+    uniform sampler2D u_tex1;
+    uniform float u_progress;
+    void main() {
+      float prog = smoothstep(0.0, 1.0, u_progress);
+      float wave = sin((v_uv.y + prog) * 6.2831) * 0.025 * (1.0 - prog);
+      vec2 uv0 = v_uv + vec2(wave, 0.0);
+      vec2 uv1 = v_uv - vec2(wave, 0.0);
+      vec4 from = texture2D(u_tex0, uv0);
+      vec4 to = texture2D(u_tex1, uv1);
+      gl_FragColor = mix(from, to, prog);
+    }
+  `;
+
+  const createShader = (type, source) => {
+    const shader = gl.createShader(type);
+    if (!shader) return null;
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    return shader;
+  };
+
+  const vertexShader = createShader(gl.VERTEX_SHADER, vertexSrc);
+  const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentSrc);
+  if (!vertexShader || !fragmentShader) return null;
+
+  const program = gl.createProgram();
+  if (!program) return null;
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  gl.useProgram(program);
+
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  const vertices = new Float32Array([
+    -1, -1, 0, 0,
+    1, -1, 1, 0,
+    -1, 1, 0, 1,
+    -1, 1, 0, 1,
+    1, -1, 1, 0,
+    1, 1, 1, 1,
+  ]);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+  const aPosition = gl.getAttribLocation(program, "a_position");
+  const aUv = gl.getAttribLocation(program, "a_uv");
+  gl.enableVertexAttribArray(aPosition);
+  gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 16, 0);
+  gl.enableVertexAttribArray(aUv);
+  gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 16, 8);
+
+  const uTex0 = gl.getUniformLocation(program, "u_tex0");
+  const uTex1 = gl.getUniformLocation(program, "u_tex1");
+  const uProgress = gl.getUniformLocation(program, "u_progress");
+
+  const createTexture = () => {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    return texture;
+  };
+
+  const tex0 = createTexture();
+  const tex1 = createTexture();
+
+  const loadImage = (src) =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+
+  const imageCache = new Map();
+  const getImage = async (src) => {
+    if (imageCache.has(src)) return imageCache.get(src);
+    const img = await loadImage(src);
+    imageCache.set(src, img);
+    return img;
+  };
+
+  let currentIndex = 0;
+  let timer = null;
+  let animating = false;
+  let resizeObserver = null;
+
+  const setSize = () => {
+    const rect = mediaWrap.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  };
+
+  const render = (progress) => {
+    gl.useProgram(program);
+    gl.uniform1f(uProgress, progress);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, tex0);
+    gl.uniform1i(uTex0, 0);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, tex1);
+    gl.uniform1i(uTex1, 1);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  };
+
+  const transitionTo = async (nextIndex) => {
+    if (animating) return;
+    animating = true;
+    const currentSrc = sources[currentIndex] || fallbackSrc;
+    const nextSrc = sources[nextIndex] || fallbackSrc;
+    try {
+      const [img0, img1] = await Promise.all([getImage(currentSrc), getImage(nextSrc)]);
+      gl.bindTexture(gl.TEXTURE_2D, tex0);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img0);
+      gl.bindTexture(gl.TEXTURE_2D, tex1);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img1);
+    } catch {
+      animating = false;
+      stop();
+      return;
+    }
+
+    const start = performance.now();
+    const duration = 450;
+    const step = (now) => {
+      const t = Math.min((now - start) / duration, 1);
+      render(t);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        currentIndex = nextIndex;
+        animating = false;
+      }
+    };
+    requestAnimationFrame(step);
+  };
+
+  const start = async () => {
+    if (timer) return;
+    mediaWrap.classList.add("is-webgl");
+    mediaWrap.appendChild(canvas);
+    setSize();
+    resizeObserver = new ResizeObserver(setSize);
+    resizeObserver.observe(mediaWrap);
+    await transitionTo(0);
+    timer = window.setInterval(() => {
+      const nextIndex = (currentIndex + 1) % sources.length;
+      transitionTo(nextIndex);
+    }, 800);
+  };
+
+  const stop = () => {
+    clearInterval(timer);
+    timer = null;
+    mediaWrap.classList.remove("is-webgl");
+    if (canvas.parentElement) canvas.remove();
+    if (resizeObserver) resizeObserver.disconnect();
+    currentIndex = 0;
+    animating = false;
+  };
+
+  return { start, stop };
 };
 
 filters.forEach((filterButton) => {

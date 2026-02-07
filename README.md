@@ -33,6 +33,7 @@ Environment assumptions:
 External dependencies (loaded via CDN):
 - Font Awesome (icons): `https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css`
 - Google Font (Geologica) and system fallback for Helvetica Neue.
+- WebGL hover transitions inspired by [`akella/webGLImageTransitions`](https://github.com/akella/webGLImageTransitions).
 
 Routing:
 - Homepage: `index.html`
