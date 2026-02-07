@@ -491,7 +491,10 @@ const renderProjects = (filter) => {
 
   filtered.forEach((project, index) => {
     const imageSource =
-      project.image || project.images?.[0] || createPlaceholder(project.title);
+      project.thumbnail ||
+      project.image ||
+      project.images?.[0] ||
+      createPlaceholder(project.title);
     const card = document.createElement("a");
     card.className = "work-card";
     const slug = project.slug || project.title.toLowerCase().replace(/\s+/g, "-");

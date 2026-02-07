@@ -411,11 +411,17 @@ const setupHeroCarousel = () => {
   const imageEl = hero.querySelector("img");
   const prev = hero.querySelector(".project-hero__nav--prev");
   const next = hero.querySelector(".project-hero__nav--next");
-  const images = [
-    imageEl?.src,
-    "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='720'%3E%3Crect width='1280' height='720' fill='%23dedede'/%3E%3Ctext x='60' y='100' font-family='Helvetica Neue, Arial, sans-serif' font-size='32' fill='%23111111'%3EHero Image 02%3C/text%3E%3C/svg%3E",
-    "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='720'%3E%3Crect width='1280' height='720' fill='%23e9e9e9'/%3E%3Ctext x='60' y='100' font-family='Helvetica Neue, Arial, sans-serif' font-size='32' fill='%23111111'%3EHero Image 03%3C/text%3E%3C/svg%3E",
-  ].filter(Boolean);
+  let images = [];
+  if (hero.dataset.images) {
+    try {
+      images = JSON.parse(decodeURIComponent(hero.dataset.images));
+    } catch {
+      images = [];
+    }
+  }
+  if (!images.length && imageEl?.src) {
+    images = [imageEl.src];
+  }
   let index = 0;
 
   const showImage = (nextIndex) => {
@@ -513,13 +519,22 @@ const getReadTime = (sections, data) => {
   return `${minutes} min read`;
 };
 
+const createHeroPlaceholder = (label) =>
+  `data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='720'%3E%3Crect width='1280' height='720' fill='%23e6e6e6'/%3E%3Ctext x='60' y='100' font-family='Helvetica Neue, Arial, sans-serif' font-size='32' fill='%23111111'%3E${encodeURIComponent(
+    label
+  )}%3C/text%3E%3C/svg%3E`;
+
 const renderProject = () => {
   if (!projectTemplate || !projectData) return;
-  const heroImages = [
-    "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='720'%3E%3Crect width='1280' height='720' fill='%23e6e6e6'/%3E%3Ctext x='60' y='100' font-family='Helvetica Neue, Arial, sans-serif' font-size='32' fill='%23111111'%3EHero Image%3C/text%3E%3C/svg%3E",
-    "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='720'%3E%3Crect width='1280' height='720' fill='%23dedede'/%3E%3Ctext x='60' y='100' font-family='Helvetica Neue, Arial, sans-serif' font-size='32' fill='%23111111'%3EHero Image 02%3C/text%3E%3C/svg%3E",
-    "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='720'%3E%3Crect width='1280' height='720' fill='%23e9e9e9'/%3E%3Ctext x='60' y='100' font-family='Helvetica Neue, Arial, sans-serif' font-size='32' fill='%23111111'%3EHero Image 03%3C/text%3E%3C/svg%3E",
-  ];
+  const heroImages =
+    (Array.isArray(projectData.heroImages) && projectData.heroImages) ||
+    (Array.isArray(projectData.images) && projectData.images) ||
+    (Array.isArray(projectData.showcase) && projectData.showcase) ||
+    [];
+  const heroImagesSafe = heroImages.length
+    ? heroImages
+    : [createHeroPlaceholder(projectData.title || "Project Hero")];
+  const heroImagesEncoded = encodeURIComponent(JSON.stringify(heroImagesSafe));
   const showcaseItems = getShowcaseItems(projectData);
   const sections = getProjectSections(projectData);
   const readTime = getReadTime(sections, projectData);
@@ -531,7 +546,7 @@ const renderProject = () => {
   } · ${toolsList.slice(0, 3).join(", ")}`;
 
   projectTemplate.innerHTML = `
-    <div class="project-hero" data-carousel>
+    <div class="project-hero" data-carousel data-images="${heroImagesEncoded}">
       <button
         type="button"
         class="project-hero__nav project-hero__nav--prev"
@@ -539,7 +554,7 @@ const renderProject = () => {
       >
         <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
       </button>
-      <img src="${heroImages[0]}" alt="Project hero image" />
+      <img src="${heroImagesSafe[0]}" alt="Project hero image" />
       <button
         type="button"
         class="project-hero__nav project-hero__nav--next"

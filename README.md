@@ -60,6 +60,13 @@ Fallback notes:
    - `showcase` (optional): array of image URLs for the work showcase carousel.
 4. Save and refresh the browser.
 
+## Image Sizes (Recommended)
+
+- **Thumbnail** (`thumbnail`): 16:9, 1600×900 (min), 1920×1080 (ideal)
+- **Hero images** (`images` or `heroImages`): 16:9, 1920×1080 (ideal), 1600×900 (min)
+- **Showcase carousel** (`showcase`): 4:5 or 3:4, 1200×1500 (ideal), 960×1200 (min)
+- **List hover preview** (uses `images`): 16:9, same as thumbnail for consistency
+
 Example project object:
 ```javascript
 {
