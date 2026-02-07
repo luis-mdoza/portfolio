@@ -239,8 +239,8 @@ main,
   justify-content: space-between;
   flex-direction: row;
   gap: 20px;
-  padding: 12px 24px;
-  width: 45vw;
+  padding: 16px 24px;
+  width: 40vw;
   min-width: 320px;
   background: rgba(255, 255, 255, 0.32);
   backdrop-filter: var(--globalnav-backdrop-filter);

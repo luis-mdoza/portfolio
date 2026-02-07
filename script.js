@@ -215,7 +215,7 @@ const preloadImage = (src) => {
 };
 
 const getLoadedImages = (sources) =>
-  sources.filter((src) => imageLoadCache.get(src) !== false);
+  sources.filter((src) => imageLoadCache.get(src) === true);
 
 const supportsWebGL = () => {
   try {
@@ -644,7 +644,7 @@ const setupHoverImages = (card, project) => {
 
   const start = () => {
     const sequence = shuffle(getLoadedImages(images));
-    if (!sequence.length) return;
+    if (sequence.length < 2) return;
     let index = 0;
     clearInterval(timer);
     timer = window.setInterval(() => {
