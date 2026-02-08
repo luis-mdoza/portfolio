@@ -545,6 +545,7 @@ const renderProjects = (filter) => {
     grid.appendChild(card);
     setupCardScramble(card);
     setupHoverImages(card, project);
+    (project.images || []).forEach(preloadImage);
     setupListHoverPreview(card, project);
     setupTitleParallax(card);
     card.addEventListener("mouseenter", () => prefetchLink(card.href));
@@ -636,21 +637,25 @@ const setupHoverImages = (card, project) => {
       .map(({ item }) => item);
 
   const start = () => {
+    preloadImage(original);
     images.forEach(preloadImage);
-    const loadedImages = getLoadedImages(images);
-    if (supportsWebGL() && loadedImages.length > 1) {
+    const hoverSources = [original, ...images].filter(Boolean);
+    if (supportsWebGL() && hoverSources.length > 1) {
       if (activeWebGLHover && activeWebGLHover !== controller) {
         activeWebGLHover.stop(true);
       }
-      controller = controller || createWebGLHover(mediaWrap, loadedImages, original);
+      if (controller) {
+        controller.stop(true);
+        controller = null;
+      }
+      controller = createWebGLHover(mediaWrap, hoverSources, original);
       if (controller) {
         activeWebGLHover = controller;
         controller.start();
         return;
       }
     }
-    if (supportsWebGL()) return;
-    const sequence = shuffle(getLoadedImages(images));
+    const sequence = shuffle(hoverSources);
     if (sequence.length < 2) return;
     let index = 0;
     clearInterval(timer);
@@ -664,14 +669,16 @@ const setupHoverImages = (card, project) => {
     clearInterval(timer);
     timer = null;
     img.src = original;
-    controller?.stop(true);
-    if (activeWebGLHover === controller) {
+    const currentController = controller;
+    currentController?.stop(true);
+    controller = null;
+    if (activeWebGLHover === currentController) {
       activeWebGLHover = null;
     }
   };
 
-  card.addEventListener("mouseenter", start);
-  card.addEventListener("mouseleave", stop);
+  card.addEventListener("pointerenter", start);
+  card.addEventListener("pointerleave", stop);
 };
 
 const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
@@ -698,13 +705,25 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     uniform sampler2D u_tex0;
     uniform sampler2D u_tex1;
     uniform float u_progress;
+    float rand(vec2 co) {
+      return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+    }
     void main() {
+      vec2 uv = vec2(v_uv.x, 1.0 - v_uv.y);
       float prog = smoothstep(0.0, 1.0, u_progress);
-      float wave = sin((v_uv.y + prog) * 6.2831) * 0.025 * (1.0 - prog);
-      vec2 uv0 = v_uv + vec2(wave, 0.0);
-      vec2 uv1 = v_uv - vec2(wave, 0.0);
-      vec4 from = texture2D(u_tex0, uv0);
-      vec4 to = texture2D(u_tex1, uv1);
+      float bands = step(0.42, rand(vec2(uv.y * 10.0, prog * 2.1)));
+      float jitter = (rand(vec2(uv.y * 20.0, prog)) - 0.5) * 0.04;
+      float tears = step(0.86, rand(vec2(uv.y * 3.0, prog))) * 0.06;
+      float shift = (0.045 + 0.06 * bands + jitter + tears) * (1.0 - prog);
+      vec2 offset = vec2(shift, 0.0);
+      vec4 fromR = texture2D(u_tex0, uv + offset);
+      vec4 fromG = texture2D(u_tex0, uv);
+      vec4 fromB = texture2D(u_tex0, uv - offset);
+      vec4 from = vec4(fromR.r, fromG.g, fromB.b, 1.0);
+      vec4 toR = texture2D(u_tex1, uv - offset);
+      vec4 toG = texture2D(u_tex1, uv);
+      vec4 toB = texture2D(u_tex1, uv + offset);
+      vec4 to = vec4(toR.r, toG.g, toB.b, 1.0);
       gl_FragColor = mix(from, to, prog);
     }
   `;
@@ -792,6 +811,7 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
   let timer = null;
   let animating = false;
   let resizeObserver = null;
+  let isActive = false;
 
   const setSize = () => {
     const rect = mediaWrap.getBoundingClientRect();
@@ -834,7 +854,7 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     }
 
     const start = performance.now();
-    const duration = 450;
+    const duration = 1100;
     const step = (now) => {
       const t = Math.min((now - start) / duration, 1);
       render(t);
@@ -849,7 +869,8 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
   };
 
   const start = async () => {
-    if (timer) return;
+    if (isActive) return;
+    isActive = true;
     mediaWrap.classList.add("is-webgl");
     mediaWrap.appendChild(canvas);
     setSize();
@@ -861,14 +882,20 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     if (WEBGL_DEBUG) {
       console.log("[webgl] start");
     }
-    await transitionTo(0);
+    if (sources.length > 1 && sources[0] === fallbackSrc) {
+      currentIndex = 0;
+      await transitionTo(1);
+    } else {
+      await transitionTo(0);
+    }
     timer = window.setInterval(() => {
       const nextIndex = (currentIndex + 1) % sources.length;
       transitionTo(nextIndex);
-    }, 800);
+    }, 1500);
   };
 
   const stop = (lose = false) => {
+    isActive = false;
     clearInterval(timer);
     timer = null;
     mediaWrap.classList.remove("is-webgl");
@@ -881,7 +908,7 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     }
   };
 
-  return { start, stop };
+  return { start, stop, isActive: () => isActive };
 };
 
 filters.forEach((filterButton) => {
@@ -1070,10 +1097,10 @@ const setupHeaderScroll = () => {
     if (currentY < 20) {
       isHidden = false;
       header.classList.remove("is-hidden");
-    } else if (delta > 4 && currentY > 60) {
+    } else if (delta > 8 && currentY > 260) {
       isHidden = true;
       header.classList.add("is-hidden");
-    } else if (delta < -4) {
+    } else if (delta < -8) {
       isHidden = false;
       header.classList.remove("is-hidden");
     }
