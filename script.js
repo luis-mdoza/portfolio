@@ -858,7 +858,7 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   };
 
-  const transitionTo = async (nextIndex, force = false) => {
+  const transitionTo = async (nextIndex, force = false, reverse = false) => {
     if (animating && !force) return;
     animating = true;
     const currentSrc = sources[currentIndex] || fallbackSrc;
@@ -882,7 +882,7 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     const duration = 1100;
     const step = (now) => {
       const t = Math.min((now - start) / duration, 1);
-      render(t);
+      render(reverse ? 1 - t : t);
       if (t < 1) {
         requestAnimationFrame(step);
       } else {
@@ -927,7 +927,7 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     clearInterval(timer);
     timer = null;
     if (currentIndex !== 0) {
-      await transitionTo(0, true);
+      await transitionTo(0, true, true);
     }
     mediaWrap.classList.remove("is-webgl");
     if (canvas.parentElement) canvas.remove();
