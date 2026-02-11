@@ -705,26 +705,33 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     uniform sampler2D u_tex0;
     uniform sampler2D u_tex1;
     uniform float u_progress;
-    float rand(vec2 co) {
-      return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+
+    float hash(vec2 p) {
+      return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x))));
     }
+
+    float hnoise(vec2 x) {
+      vec2 i = floor(x);
+      vec2 f = fract(x);
+      float a = hash(i);
+      float b = hash(i + vec2(1.0, 0.0));
+      float c = hash(i + vec2(0.0, 1.0));
+      float d = hash(i + vec2(1.0, 1.0));
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+    }
+
     void main() {
       vec2 uv = vec2(v_uv.x, 1.0 - v_uv.y);
       float prog = smoothstep(0.0, 1.0, u_progress);
-      float bands = step(0.42, rand(vec2(uv.y * 10.0, prog * 2.1)));
-      float jitter = (rand(vec2(uv.y * 20.0, prog)) - 0.5) * 0.04;
-      float tears = step(0.86, rand(vec2(uv.y * 3.0, prog))) * 0.06;
-      float shift = (0.045 + 0.06 * bands + jitter + tears) * (1.0 - prog);
-      vec2 offset = vec2(shift, 0.0);
-      vec4 fromR = texture2D(u_tex0, uv + offset);
-      vec4 fromG = texture2D(u_tex0, uv);
-      vec4 fromB = texture2D(u_tex0, uv - offset);
-      vec4 from = vec4(fromR.r, fromG.g, fromB.b, 1.0);
-      vec4 toR = texture2D(u_tex1, uv - offset);
-      vec4 toG = texture2D(u_tex1, uv);
-      vec4 toB = texture2D(u_tex1, uv + offset);
-      vec4 to = vec4(toR.r, toG.g, toB.b, 1.0);
-      gl_FragColor = mix(from, to, prog);
+      float hn = hnoise(uv * 10.0);
+      vec2 dir = normalize(vec2(0.5) - uv);
+      vec2 d = vec2(0.0, dir.y);
+      vec2 uv1 = uv + d * prog / 5.0 * (1.0 + hn * 0.5);
+      vec2 uv2 = uv - d * (1.0 - prog) / 5.0 * (1.0 + hn * 0.5);
+      vec4 t1 = texture2D(u_tex0, uv1);
+      vec4 t2 = texture2D(u_tex1, uv2);
+      gl_FragColor = mix(t1, t2, prog);
     }
   `;
 
