@@ -18,7 +18,7 @@ window.PROJECTS = [
         "Role & Duration: Lead UX UI Designer for a multi-month migration project, collaborating with engineering and product to deliver a feature-parity React Native app.",
         "Problem: The existing Flutter app limited hiring velocity and development efficiency; React Native offers a larger developer pool and faster ramp-up.",
         "Solution: Migrate Kasheesh’s mobile app to React Native while preserving all current features, introduce a new card-selection toggle to replace the star UI, update branding, and align mobile designs with the shared React design system.",
-        "Outcome: Scalable foundation for future revenue features, reduced technical debt, improved engineering velocity, and a better cross-platform experience.
+        "Outcome: Scalable foundation for future revenue features, reduced technical debt, improved engineering velocity, and a better cross-platform experience.",
       ],
     },
     sections: [
