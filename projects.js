@@ -1,6 +1,6 @@
 window.PROJECTS = [
   {
-    slug: "tracking-risky-users",
+    slug: "tracking-risky-user",
     title: "Tracking Risky Users",
     year: "2026",
     type: "Kasheesh",
