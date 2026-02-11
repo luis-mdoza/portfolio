@@ -1,19 +1,13 @@
 window.PROJECTS = [
   {
     slug: "react-native-migration",
-    title: "React Native Migration",
-    year: "2025",
-    type: "Application",
-    tags: ["app", "service"],
+    title: "Tracking Risky Users",
+    year: "2026",
+    type: "Ux Ui Design Strategy",
+    tags: ["SaSS", "FinTech", "UX", "UI", "Strategy"],
     thumbnail: "assets/projects/2602-admin-user-flags/thumbnail.jpg",
-    images: [
-      "assets/projects/2602-admin-user-flags/images-00.jpg",
-      "assets/projects/2602-admin-user-flags/images-01.jpg",
-      "assets/projects/2602-admin-user-flags/images-02.jpg",
-      "assets/projects/2602-admin-user-flags/images-03.jpg",
-    ],
     tldr: {
-      heading: "React Native Migration (20-second TLDR)",
+      heading: "Tracking Risky Users (20-second TLDR)",
       bullets: [
         "Role & Duration: Lead Product Designer for a multi-month migration project, collaborating with engineering and product to deliver a feature-parity React Native app.",
         "Problem: The existing Flutter app limited hiring velocity and development efficiency; React Native offers a larger developer pool and faster ramp-up.",
