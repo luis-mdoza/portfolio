@@ -831,6 +831,7 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
   let currentIndex = 0;
   let timer = null;
   let animating = false;
+  let isStopping = false;
   let resizeObserver = null;
   let isActive = false;
 
@@ -854,8 +855,8 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   };
 
-  const transitionTo = async (nextIndex) => {
-    if (animating) return;
+  const transitionTo = async (nextIndex, force = false) => {
+    if (animating && !force) return;
     animating = true;
     const currentSrc = sources[currentIndex] || fallbackSrc;
     const nextSrc = sources[nextIndex] || fallbackSrc;
@@ -890,8 +891,9 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
   };
 
   const start = async () => {
-    if (isActive) return;
+    if (isActive || isStopping) return;
     isActive = true;
+    isStopping = false;
     mediaWrap.classList.add("is-webgl");
     mediaWrap.appendChild(canvas);
     setSize();
@@ -915,10 +917,15 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     }, 1500);
   };
 
-  const stop = (lose = false) => {
+  const stop = async (lose = false) => {
+    if (isStopping) return;
+    isStopping = true;
     isActive = false;
     clearInterval(timer);
     timer = null;
+    if (currentIndex !== 0) {
+      await transitionTo(0, true);
+    }
     mediaWrap.classList.remove("is-webgl");
     if (canvas.parentElement) canvas.remove();
     if (resizeObserver) resizeObserver.disconnect();
@@ -927,6 +934,7 @@ const createWebGLHover = (mediaWrap, sources, fallbackSrc) => {
     if (lose) {
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     }
+    isStopping = false;
   };
 
   return { start, stop, isActive: () => isActive };
