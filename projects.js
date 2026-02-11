@@ -3,16 +3,22 @@ window.PROJECTS = [
     slug: "react-native-migration",
     title: "Tracking Risky Users",
     year: "2026",
-    type: "Ux Ui Design Strategy",
+    type: "UX UI Design Strategy",
     tags: ["SaSS", "FinTech", "UX", "UI", "Strategy"],
     thumbnail: "assets/projects/2602-admin-user-flags/thumbnail.jpg",
+    images: [
+      "assets/projects/2602-admin-user-flags/images-00.jpg",
+      "assets/projects/2602-admin-user-flags/images-01.jpg",
+      "assets/projects/2602-admin-user-flags/images-02.jpg",
+      "assets/projects/2602-admin-user-flags/images-03.jpg",
+    ],
     tldr: {
       heading: "Tracking Risky Users (20-second TLDR)",
       bullets: [
-        "Role & Duration: Lead Product Designer for a multi-month migration project, collaborating with engineering and product to deliver a feature-parity React Native app.",
+        "Role & Duration: Lead UX UI Designer for a multi-month migration project, collaborating with engineering and product to deliver a feature-parity React Native app.",
         "Problem: The existing Flutter app limited hiring velocity and development efficiency; React Native offers a larger developer pool and faster ramp-up.",
         "Solution: Migrate Kasheesh’s mobile app to React Native while preserving all current features, introduce a new card-selection toggle to replace the star UI, update branding, and align mobile designs with the shared React design system.",
-        "Outcome: Scalable foundation for future revenue features, reduced technical debt, improved engineering velocity, and a better cross-platform experience.",
+        "Outcome: Scalable foundation for future revenue features, reduced technical debt, improved engineering velocity, and a better cross-platform experience.
       ],
     },
     sections: [
