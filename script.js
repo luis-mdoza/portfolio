@@ -630,6 +630,7 @@ const setupHoverImages = (card, project) => {
 
   let timer = null;
   let controller = null;
+  let fadeTimeout = null;
   const shuffle = (list) =>
     list
       .map((item) => ({ item, sort: Math.random() }))
@@ -637,6 +638,11 @@ const setupHoverImages = (card, project) => {
       .map(({ item }) => item);
 
   const start = () => {
+    if (fadeTimeout) {
+      clearTimeout(fadeTimeout);
+      fadeTimeout = null;
+    }
+    img.classList.remove("is-fading");
     preloadImage(original);
     images.forEach(preloadImage);
     const hoverSources = [original, ...images].filter(Boolean);
@@ -668,13 +674,21 @@ const setupHoverImages = (card, project) => {
   const stop = () => {
     clearInterval(timer);
     timer = null;
-    img.src = original;
     const currentController = controller;
     currentController?.stop(true);
     controller = null;
     if (activeWebGLHover === currentController) {
       activeWebGLHover = null;
     }
+    img.classList.add("is-fading");
+    if (fadeTimeout) clearTimeout(fadeTimeout);
+    fadeTimeout = window.setTimeout(() => {
+      img.src = original;
+      requestAnimationFrame(() => {
+        img.classList.remove("is-fading");
+      });
+      fadeTimeout = null;
+    }, 200);
   };
 
   card.addEventListener("pointerenter", start);
