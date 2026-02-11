@@ -675,10 +675,13 @@ const setupHoverImages = (card, project) => {
     clearInterval(timer);
     timer = null;
     const currentController = controller;
-    currentController?.stop(true);
-    controller = null;
-    if (activeWebGLHover === currentController) {
-      activeWebGLHover = null;
+    if (currentController) {
+      currentController.stop(false);
+      controller = null;
+      if (activeWebGLHover === currentController) {
+        activeWebGLHover = null;
+      }
+      return;
     }
     img.classList.add("is-fading");
     if (fadeTimeout) clearTimeout(fadeTimeout);
