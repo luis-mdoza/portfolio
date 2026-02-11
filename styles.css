@@ -675,8 +675,11 @@ html.is-safari a::before {
 }
 
 .work-card__title {
-  font-size: 10px;
+  font-family: "Georgia", serif;
+  font-size: 16px;
   font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.005em;
 }
 
 .work-card__tags {

@@ -1,9 +1,9 @@
 window.PROJECTS = [
   {
-    slug: "react-native-migration",
+    slug: "tracking-risky-users",
     title: "Tracking Risky Users",
     year: "2026",
-    type: "UX UI Design Strategy",
+    type: "Kasheesh",
     tags: ["SaSS", "FinTech", "UX", "UI", "Strategy"],
     thumbnail: "assets/projects/2602-admin-user-flags/thumbnail.jpg",
     images: [
