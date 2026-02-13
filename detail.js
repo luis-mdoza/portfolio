@@ -275,6 +275,53 @@ const setupLanguageSwitch = () => {
   });
 };
 
+const setupUnlockGate = () => {
+  const PASSWORD = "EnterM3";
+  const STORAGE_KEY = "portfolio_unlocked";
+  if (sessionStorage.getItem(STORAGE_KEY) === "true") return;
+
+  document.body.classList.add("is-locked");
+  const gate = document.createElement("div");
+  gate.className = "unlock-gate is-visible";
+  gate.innerHTML = `
+    <form class="unlock-gate__panel" autocomplete="off">
+      <div class="unlock-gate__title">Enter password to unlock</div>
+      <input
+        class="unlock-gate__input"
+        type="password"
+        name="password"
+        placeholder="Password"
+        aria-label="Password"
+        required
+      />
+      <button class="unlock-gate__button" type="submit">Unlock</button>
+      <div class="unlock-gate__error" aria-live="polite"></div>
+    </form>
+  `;
+  document.body.appendChild(gate);
+
+  const form = gate.querySelector("form");
+  const input = gate.querySelector("input");
+  const error = gate.querySelector(".unlock-gate__error");
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (input.value === PASSWORD) {
+      sessionStorage.setItem(STORAGE_KEY, "true");
+      document.body.classList.remove("is-locked");
+      gate.classList.remove("is-visible");
+      gate.remove();
+      return;
+    }
+    gate.classList.add("is-error");
+    error.textContent = "Incorrect password.";
+    input.select();
+    setTimeout(() => gate.classList.remove("is-error"), 350);
+  });
+
+  setTimeout(() => input.focus(), 50);
+};
+
 const setupMobileMenu = () => {
   const toggle = document.querySelector(".menu-toggle");
   const actions = document.querySelector(".site-actions");
@@ -1102,6 +1149,7 @@ setupCursor();
 setupHoverScramble();
 setupLanguageSwitch();
 setupHeroCarousel();
+setupUnlockGate();
 setupMobileMenu();
 setupHeaderScroll();
 setupRoleRotation();

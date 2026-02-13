@@ -79,6 +79,107 @@ body.is-intro .scroll-progress {
   opacity: 0;
 }
 
+body.is-locked {
+  overflow: hidden;
+}
+
+body.is-locked main,
+body.is-locked .site-header,
+body.is-locked .site-footer,
+body.is-locked .breadcrumb,
+body.is-locked .project-content,
+body.is-locked .project-close {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.unlock-gate {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  z-index: 1000;
+}
+
+.unlock-gate.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.unlock-gate__panel {
+  min-width: min(320px, 90vw);
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.08);
+  display: grid;
+  gap: 12px;
+  text-align: center;
+}
+
+.unlock-gate__title {
+  font-family: "Georgia", serif;
+  font-size: 16px;
+  text-transform: none;
+  letter-spacing: 0.005em;
+}
+
+.unlock-gate__input {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font: inherit;
+  text-transform: none;
+  letter-spacing: 0.4px;
+}
+
+.unlock-gate__button {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #111111;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.unlock-gate__error {
+  color: #b3261e;
+  text-transform: none;
+  letter-spacing: 0.2px;
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.unlock-gate.is-error .unlock-gate__panel {
+  animation: gate-shake 0.3s ease;
+}
+
+@keyframes gate-shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  50% {
+    transform: translateX(6px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
